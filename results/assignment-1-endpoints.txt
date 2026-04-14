@@ -1,0 +1,51 @@
+- **Lambda Zip Function URL:**  
+  https://unuhwyn7wcngfstqbkqnlmkd6q0kyruo.lambda-url.us-east-1.on.aws/
+
+  ```
+  [ec2-user@ip-172-31-64-216 lsc-lab4-aws-cloud-r2-baramundi666]$ # Test via CLI invoke (bypasses Function URL auth):
+    aws lambda invoke --function-name lsc-knn-zip \
+        --cli-binary-format raw-in-base64-out \
+        --payload "$(python3 -c 'import json; q=json.load(open("loadtest/query.json")); print(json.dumps({"body": json.dumps(q)}))')" \
+        /tmp/out.json
+    cat /tmp/out.json
+    {
+        "StatusCode": 200,
+        "ExecutedVersion": "$LATEST"
+    }
+    {"statusCode": 200, "headers": {"Content-Type": "application/json", "X-Server-Time-Ms": "65.566", "X-Instance-Id": "2026/04/08/[$LATEST]445b9c89d34b4c17a8d0ed7144e6ad68", "X-Cold-Start": "true"}, "body": "{\"results\": [{\"index\": 35859, \"distance\": 12.001459121704102}, {\"index\": 24682, \"distance\": 12.059946060180664}, {\"index\": 35397, \"distance\": 12.487079620361328}, {\"index\": 20160, \"distance\": 12.489519119262695}, {\"index\": 30454, \"distance\": 12.499402046203613}], \"query_time_ms\": 65.566, \"instance_id\": \"2026/04/08/[$LATEST]445b9c89d34b4c17a8d0ed7144e6ad68\", \"cold_start\": true}"}
+  ```
+
+- **Lambda Container Function URL:**  
+  https://3n4ms5u5p2kwnrjskbyj5jtsxa0byzwr.lambda-url.us-east-1.on.aws/
+
+  ```
+  [ec2-user@ip-172-31-64-216 lsc-lab4-aws-cloud-r2-baramundi666]$ aws lambda invoke --function-name lsc-knn-container \
+    --cli-binary-format raw-in-base64-out \
+    --payload "$(python3 -c 'import json; q=json.load(open("loadtest/query.json")); print(json.dumps({"body": json.dumps(q)}))')" \
+    /tmp/out.json
+    cat /tmp/out.json
+    {
+        "StatusCode": 200,
+        "ExecutedVersion": "$LATEST"
+    }
+    {"statusCode": 200, "headers": {"Content-Type": "application/json", "X-Server-Time-Ms": "75.038", "X-Instance-Id": "2026/04/08/[$LATEST]de2c8ddf760c49bdb88f35c87742adf5", "X-Cold-Start": "true"}, "body": "{\"results\": [{\"index\": 35859, \"distance\": 12.001459121704102}, {\"index\": 24682, \"distance\": 12.059946060180664}, {\"index\": 35397, \"distance\": 12.487079620361328}, {\"index\": 20160, \"distance\": 12.489519119262695}, {\"index\": 30454, \"distance\": 12.499402046203613}], \"query_time_ms\": 75.038, \"instance_id\": \"2026/04/08/[$LATEST]de2c8ddf760c49bdb88f35c87742adf5\", \"cold_start\": true}"}
+  ```
+
+- **Fargate ALB URL:**  
+  http://lsc-knn-alb-228687159.us-east-1.elb.amazonaws.com
+
+  ```
+  curl -X POST -H "Content-Type: application/json" -d @loadtest/query.json     http://lsc-knn-alb-228687159.us-east-1.elb.amazonaws.com/search
+    {"instance_id":"ip-172-31-2-183.ec2.internal","query_time_ms":25.52,"results":[{"distance":12.001459121704102,"index":35859},{"distance":12.059946060180664,"index":24682},{"distance":12.487079620361328,"index":35397},{"distance":12.489519119262695,"index":20160},{"distance":12.499402046203613,"index":30454}]}
+
+  ```
+
+- **EC2 Direct HTTP:**  
+  http://3.236.50.31 (t3.small, us-east-1)
+
+  ```
+  curl -X POST -H "Content-Type: application/json" -d @loadtest/query.json \
+    http://3.236.50.31:8080/search
+    {"instance_id":"886196d82eb9","query_time_ms":25.094,"results":[{"distance":12.001459121704102,"index":35859},{"distance":12.059946060180664,"index":24682},{"distance":12.487079620361328,"index":35397},{"distance":12.489519119262695,"index":20160},{"distance":12.499402046203613,"index":30454}]}
+
+  ```
